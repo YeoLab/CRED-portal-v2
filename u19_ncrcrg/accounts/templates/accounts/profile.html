@@ -1,0 +1,20 @@
+{% include "./nav.html" %}
+{% load plotly_dash %}
+{% block body %}
+    {% plotly_header %}
+    {% plotly_direct name='JobStatusApp'%}
+    {% plotly_footer %}
+    <div class="container">
+        <h1>Profile</h1>
+        <p>Username: {{ uform.username }}</p>
+        <p>First name: {{ uform.first_name }}</p>
+        <p>Last name: {{ uform.last_name }}</p>
+        <p>Email: {{ uform.email }}</p>
+        <p>Lab: {{ pform.lab }}</p>
+        <p>Institution: {{ pform.institution }}</p>
+        {% if pform.image %}
+        <img src="{{ pform.image.url }}" width="240">
+        {% endif %}
+    </div>
+
+{% endblock %}

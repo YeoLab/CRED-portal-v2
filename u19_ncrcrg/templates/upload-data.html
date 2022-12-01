@@ -1,0 +1,9 @@
+{% extends "./base.html" %}
+{% include "nav.html" %}
+{% load plotly_dash %}
+{% block body %}
+    {% plotly_header %}
+    {%plotly_direct name='UploadDataApp'%}
+    {% plotly_footer %}
+{% endblock %}
+

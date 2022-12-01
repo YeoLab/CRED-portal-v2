@@ -1,0 +1,56 @@
+{% set name = "django_plotly_dash" %}
+{% set version = "1.6.6" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
+
+source:
+  url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
+  sha256: 86c461996e15a10197fd25ca7b7f17ee483acf41964e22324bf8b17b1690dfde
+
+build:
+  number: 0
+  script: "{{ PYTHON }} -m pip install . -vv"
+
+requirements:
+  host:
+    - dash >=1.11,<1.21.0
+    - dash-core-components
+    - dash-html-components
+    - dash-renderer
+    - django >=2.2
+    - dpd-components
+    - flask >=1.0.2
+    - pip
+    - plotly
+    - python
+  run:
+    - dash >=1.11,<1.21.0
+    - dash-core-components
+    - dash-html-components
+    - dash-renderer
+    - django >=2.2
+    - dpd-components
+    - flask >=1.0.2
+    - plotly
+    - python
+
+test:
+  imports:
+    - django_plotly_dash
+    - django_plotly_dash.migrations
+    - django_plotly_dash.templatetags
+
+about:
+  home: "https://github.com/GibbsConsulting/django-plotly-dash"
+  license: MIT
+  license_family: MIT
+  license_file: 
+  summary: "Django use of plotly dash apps through template tags"
+  doc_url: 
+  dev_url: 
+
+extra:
+  recipe-maintainers:
+    - your-github-id-here

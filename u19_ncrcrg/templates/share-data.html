@@ -1,0 +1,8 @@
+{% extends "./base.html" %}
+{% include "nav.html" %}
+{% load plotly_dash %}
+{% block body %}
+    {% plotly_header %}
+    {%plotly_direct name='ShareDataApp'%}
+    {% plotly_footer %}
+{% endblock %}

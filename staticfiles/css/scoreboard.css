@@ -1,0 +1,13 @@
+.sc-block {
+    text-align: center;
+    color: red;
+    top: 30%;
+    left: 100%;
+    position: absolute;
+    z-index: 2;
+}
+
+table .sc-block {
+  table-layout: auto !important;
+  width: 100%
+}

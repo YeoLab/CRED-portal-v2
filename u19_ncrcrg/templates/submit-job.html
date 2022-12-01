@@ -1,0 +1,69 @@
+{% extends "./base.html" %}
+{% include "nav.html" %}
+{% load crispy_forms_tags %}
+{% load plotly_dash %}
+{% block body %}
+    {% plotly_header %}
+    {% plotly_direct name='SubmitJobApp' %}
+    {% plotly_footer %}
+    <div class="container">
+    {% for tool_id, tool in forms.items %}
+      {% if forloop.first %}<div class="row my-4">{% endif %}
+      <div class="col mx-auto">
+      <div class="card" style="width: 20rem;">
+        <div class="card-body">
+          <h5 class="card-title">{{ tool.name }}</h5>
+          <div class="collapse" id="collapse-{{ tool_id }}">
+            <p class="card-text my-2">{{ tool.description }}</p>
+          </div>
+          <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapse-{{ tool_id }}" aria-expanded="false" aria-controls="collapse-{{ tool_id }}">
+            Description
+          </button>
+          <!-- Button trigger modal -->
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-{{ tool_id }}">
+            Run job
+          </button>
+        </div>
+      </div>
+      </div>
+
+
+      <!-- Modal -->
+      <div class="modal fade bd-example-modal-xl" id="modal-{{ tool_id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modal-label-{{ tool_id }}">{{ tool.name }}</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form action="/submit-job/" method="post" id="form-{{ tool_id }}">
+                {% csrf_token %}
+                <!-- {% crispy tool.form tool.form.helper %} -->
+                {{ tool.form|crispy }}
+            </div>
+            <div class="modal-footer" id="modal-footer-{{ tool_id }}">
+              <button
+                  type="submit"
+                  class="btn btn-primary click"
+                  id="submit_job_ft-{{ tool_id }}"
+                  onclick="showLoaderOnClick(`modal-footer-{{ tool_id }}`, `form-{{ tool_id }}`, `submit_job_ft-{{ tool_id }}`)">
+                Submit
+              </button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% if forloop.counter|divisibleby:3 %}</div><div class="row my-4">{% endif %}
+      {% if forloop.last %}</div>{% endif %}
+    {% endfor %}
+
+    </div>
+
+
+{% endblock %}
+

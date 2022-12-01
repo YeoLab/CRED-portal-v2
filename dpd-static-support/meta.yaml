@@ -1,0 +1,38 @@
+{% set name = "dpd-static-support" %}
+{% set version = "0.0.5" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
+
+source:
+  url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
+  sha256: ba03e2fde126b45b20df63e3c5eb162d1e9c2ca83868ef37b6f5482abe6f81aa
+
+build:
+  number: 0
+  script: "{{ PYTHON }} -m pip install . -vv"
+
+requirements:
+  host:
+    - pip
+    - python
+  run:
+    - python
+
+test:
+  imports:
+    - dpd_static_support
+
+about:
+  home: "https://github.com/GibbsConsulting/dpd-static-support"
+  license: MIT
+  license_family: MIT
+  license_file: 
+  summary: "Support for static assets in django-plotly-dash"
+  doc_url: 
+  dev_url: 
+
+extra:
+  recipe-maintainers:
+    - your-github-id-here

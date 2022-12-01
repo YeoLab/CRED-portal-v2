@@ -1,0 +1,230 @@
+{% extends "./base.html" %}
+{% include "nav.html" %}
+{% load crispy_forms_tags %}
+{% load plotly_dash %}
+{% block body %}
+    {% plotly_header %}
+    {% plotly_direct name='PaperShowcaseApp' %}
+    {% plotly_footer %}
+    <tr class="container">
+        <p class="container">
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseFilter"
+                    aria-expanded="false" aria-controls="collapseExample">
+                Filter Options
+            </button>
+        </p>
+        <div class="collapse mx-4" id="collapseFilter">
+            <form method="GET">
+
+                <div class="row justify-content-end">
+                    <div class="col-4 text-right">
+                        <div class="form-group">
+                            <label>Filter by Keyword</label>
+                            <hr/>
+                            <input type="text" class="form-control my-4" name="title_term" id="title_term"
+                                   value="{{ title_term }}" placeholder="Filter by title">
+                            <input type="text" class="form-control my-4" name="author_term" id="author_term"
+                                   value="{{ author_term }}" placeholder="Filter by author">
+                            <input type="text" class="form-control my-4" name="mesh_keywords" id="mesh_keywords"
+                                   value="{{ mesh_keywords }}" placeholder="Filter by MeSH keyword">
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row justify-content-end">
+                    <div class="col-4 text-right">
+                        <button type="submit" class="btn btn-primary mx-2">Filter</button>
+                        <button type="submit" class="btn btn-primary mx-2" value="reset" name="reset">Reset</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <hr/>
+
+        <div class="container">
+            <table class="table table-striped table-hover my-2">
+                <thead>
+                <tr>
+                    <th>Year</th>
+                    <th>Paper</th>
+                    <th>Authors</th>
+                    <th>More info</th>
+                    <th>Import Omero</th>
+                    <th>Import Proteomics</th>
+                    <th>Import Genomics</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% if forloop.first %}
+                    <tr></tr>{% endif %}
+                {% for doi, form in forms.items %}
+                    <tr>
+                        <td class="col-sm-1">{{ form.pub_year }}</td>
+                        <td class="col-sm-2">{{ form.name }}</td>
+                        <td class="col-sm-1">{{ form.authors }}</td>
+                        <td class="col-sm-6">
+                            <button class="btn btn-secondary" type="button" data-toggle="collapse"
+                                    data-target="#collapse-{{ doi }}" aria-expanded="false"
+                                    aria-controls="collapse-{{ tool_id }}">
+                                +
+                            </button>
+                            <div class="collapse" id="collapse-{{ doi }}">
+                                <div class="card">
+                                  <div class="card-body">
+                                    <h6 class="card-subtitle mb-2 text-muted">Full author list</h6>
+                                    <p class="card-text">{{ form.full_authors }}</p>
+                                    <h6 class="card-subtitle mb-2 text-muted">Abstract</h6>
+                                    <p class="card-text">{{ form.abstract }}</p>
+                                    <h6 class="card-subtitle mb-2 text-muted">LinkOut</h6>
+                                    <p class="card-text"><a href={{ form.pmid_link }} target="_blank" class="card-link">Pubmed</a></p>
+                                    <p class="card-text"><a href={{ form.doi_link }} target="_blank" class="card-link">DOI</a></p>
+                                    {% for link_name in form.other_accessions.items %}
+                                      <p class="card-text"><a href={{ link_name.1 }} target="_blank" class="card-link">{{ link_name.0 }}</a></p>
+                                    {% endfor %}
+
+                                  </div>
+                                </div>
+                            </div>
+                        </td>
+                        {% if user.is_authenticated %}
+                            {% if form.form.omero_accessions|length > 0 %}
+                                <td class="col-sm-1">
+                                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                                            data-target="#modal-omero-{{ doi }}">
+                                        View OMERO Images
+                                    </button>
+                                </td>
+                            {% else %}
+                                <td class="col-sm-1"></td>
+                            {% endif %}
+                            {% if form.form.pride_accessions|length > 0 %}
+                                <td class="col-sm-1">
+                                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                                            data-target="#modal-pride-{{ doi }}">
+                                        Import PRIDE Data
+                                    </button>
+                                </td>
+                            {% else %}
+                                <td class="col-sm-1"></td>
+                            {% endif %}
+                            {% if form.form.geo_accessions|length > 0 %}
+                                <td class="col-sm-1">
+                                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                                            data-target="#modal-geo-{{ doi }}">
+                                        Import GEO Data
+                                    </button>
+                                </td>
+                            {% else %}
+                                <td class="col-sm-1"></td>
+                            {% endif %}
+                        {% endif %}
+                        <!-- Button trigger modal -->
+
+                    </tr>
+
+                    <!-- Modal for GEO -->
+                    <div class="modal fade bd-example-modal-xl" id="modal-geo-{{ doi }}" tabindex="-1" role="dialog"
+                         aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-xl" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="modal-label-{{ doi }}">{{ form.name }}</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="/papers/" method="post" id="form-geo-{{ doi }}"/>
+                                    {% csrf_token %}
+                                    {{ form.form.geo_accessions|as_crispy_field:"bootstrap4" }}
+                                </div>
+                                <div class="modal-footer" id="modal-footer-geo-{{ doi }}">
+                                    <!-- <button type="submit" class="btn btn-primary" id="submit_job_ft">Submit</button> -->
+                                    <button
+                                            type="submit"
+                                            class="btn btn-primary click"
+                                            id="submit-btn-geo-{{ doi }}"
+                                            onclick="showLoaderOnClick(`modal-footer-geo-{{ doi }}`, `form-geo-{{ doi }}`, `submit-btn-geo-{{ doi }}`)">
+                                        Submit
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- Modal for PRIDE -->
+                    <div class="modal fade bd-example-modal-xl" id="modal-pride-{{ doi }}" tabindex="-1" role="dialog"
+                         aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-xl" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="modal-label-pride-{{ doi }}">{{ form.name }}</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="/papers/" method="post" id="form-pride-{{ doi }}"/>
+                                    {% csrf_token %}
+                                    {{ form.form.pride_accessions|as_crispy_field:"bootstrap4" }}
+                                </div>
+                                <div class="modal-footer" id="modal-footer-pride-{{ doi }}">
+                                    <button
+                                            type="submit"
+                                            class="btn btn-primary click"
+                                            id="submit-btn-pride-{{ doi }}"
+                                            onclick="showLoaderOnClick(`modal-footer-pride-{{ doi }}`, `form-pride-{{ doi }}`, `submit-btn-pride-{{ doi }}`)">
+                                        Submit
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- Modal for OMERO -->
+                    <div class="modal fade bd-example-modal-xl" id="modal-omero-{{ doi }}" tabindex="-1" role="dialog"
+                         aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-xl" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title"
+                                        id="modal-label-omero-{{ doi }}">{{ form.name }}</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="/papers/" method="post" id="form-omero-{{ doi }}"/>
+                                    {% csrf_token %}
+                                    {{ form.form.omero_accessions|as_crispy_field:"bootstrap4" }}
+                                </div>
+                                <div class="modal-footer" id="modal-footer-omero-{{ doi }}">
+                                    <button
+                                            type="submit"
+                                            class="btn btn-primary click"
+                                            id="submit-btn-omero-{{ doi }}"
+                                            onclick="showLoaderOnClick(`modal-footer-omero-{{ doi }}`, `form-omero-{{ doi }}`, `submit-btn-omero-{{ doi }}`)">
+                                        Submit
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </tr>
+
+
+
+{% endblock %}

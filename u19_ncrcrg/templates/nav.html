@@ -1,0 +1,8 @@
+{% extends "./base.html" %}
+{% load plotly_dash %}
+{% block nav %}
+    {% plotly_header %}
+    {%plotly_direct name='cp_navbar_intro'%}
+    {% plotly_footer %}
+{% endblock %}
+

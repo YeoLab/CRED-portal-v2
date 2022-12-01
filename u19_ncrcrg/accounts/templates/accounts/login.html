@@ -1,0 +1,57 @@
+{% include "nav.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block body %}
+
+    {% if form.errors %}
+        <p>Your username and password didn't match. Please try again.</p>
+    {% endif %}
+
+    {% if next %}
+        {% if user.is_authenticated %}
+            <p>Your account doesn't have access to this page. To proceed,
+                please login with an account that has access.</p>
+        {% else %}
+            <p>Please login to see this page.</p>
+        {% endif %}
+    {% endif %}
+    <br><br>
+    <div class="row" style="text-align: center">
+        <h2>
+            Sign in
+        </h2>
+    </div>
+    <div class="bs-docs-section"><br><br>
+        <div class="row" style="width: 400px; margin:0 auto;">
+            {% if uuid %}
+                <form name="login" method="post" action={% url 'accounts:login' %}>
+                    {% csrf_token %}
+
+                    <input type="hidden" name="remember" value="true"/>
+                    <div>
+                        <input id="remember_me" type="checkbox"
+                               class="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out"/>
+                        <label for="remember_me" class="ml-2 block text-sm leading-5 text-gray-900">
+                            Remember me
+                        </label>
+                    </div>
+                    <div class="text-sm leading-5">
+                        <a href="{% url 'accounts:reset_password' %}"
+                           class="font-medium text-blue-600 hover:text-blue-500 focus:outline-none focus:underline transition ease-in-out duration-150">
+                            Forgot your password?
+                        </a>
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-lg btn-primary" style="width: 100%">
+                        Sign in
+                    </button>
+                    <input class="login_button" type="hidden" name="next" value=""/>
+                    <br>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}

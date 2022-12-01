@@ -1,0 +1,41 @@
+{% extends "../base.html" %}
+{% include "nav.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% block body %}
+
+<div class="flex items-center justify-center">
+
+    <div class="max-w-md w-full">
+        <br><br><br>
+            <h2 class="my-4 mt-6 text-center text-3xl leading-9 font-extrabold text-gray-900">
+                Sign up!
+            </h2>
+        {% if form.errors %}
+            {% for error in form.errors %}
+                <p style="color:red">
+                    Please correct the following errors in these fields: {{ error }}
+                </p>
+            {% endfor %}
+        {% endif %}
+        <div class="bs-docs-section"><br><br>
+            <div class="row" style="width: 500px; margin:0 auto">
+                <form method="post" class="shadow-md rounded px-8 pt-6 pb-8 mb-4" >
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="fieldWrapper form-group">
+                            {{ field.errors }}
+                            {{ field.label_tag }}
+                            {% render_field field class="form-control" %}
+                            {% if field.help_text %}
+                                <p class="help">{{ field.help_text|safe }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <button class="btn btn-primary" type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
